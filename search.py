@@ -52,21 +52,44 @@ class SearchProblem:
 
 
 def depth_first_search(problem):
-    """
-    Search the deepest nodes in the search tree first.
+	"""
+	Search the deepest nodes in the search tree first.
 
-    Your search algorithm needs to return a list of actions that reaches
-    the goal. Make sure to implement a graph search algorithm.
+	Your search algorithm needs to return a list of actions that reaches
+	the goal. Make sure to implement a graph search algorithm.
 
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
+	To get started, you might want to try some of these simple commands to
+	understand the search problem that is being passed in:
+
+	"""
+	"*** YOUR CODE HERE ***"
+
+	def dfs_paths(graph, start, goal, path=None):
+		if path is None:
+			path = [start]
+		if start == goal:
+			yield path
+		for next in graph[start] - set(path):
+			yield from dfs_paths(graph, next, goal, path + [next])
+	# list(dfs_paths(graph, 'C', 'F'))  # [['C', 'F'], ['C', 'A', 'B', 'E', 'F']]
 
 	print("Start:", problem.get_start_state().state)
-    print("Is the start a goal?", problem.is_goal_state(problem.get_start_state()))
-    print("Start's successors:", problem.get_successors(problem.get_start_state()))
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+	print("Is the start a goal?",
+	      problem.is_goal_state(problem.get_start_state()))
+
+	print("Start's successors:",
+	      problem.get_successors(problem.get_start_state()))
+	a = problem.get_successors(problem.get_start_state())[0][0]
+	# b = problem.get_successors(a.state)
+	print(a.state)
+	# print(problem.get_successors())
+	# while not problem.is_goal_state(problem.get_start_state()):
+	# 	for ()
+	# 		break
+
+	return [problem.get_successors(problem.get_start_state())[0][1]]
+
+	# util.raiseNotDefined()
 
 
 def breadth_first_search(problem):
