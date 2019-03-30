@@ -3,52 +3,51 @@ In search.py, you will implement generic search algorithms
 """
 
 import util
+import numpy as np
 
 
 class SearchProblem:
-    """
-    This class outlines the structure of a search problem, but doesn't implement
-    any of the methods (in object-oriented terminology: an abstract class).
+	"""
+	This class outlines the structure of a search problem, but doesn't implement
+	any of the methods (in object-oriented terminology: an abstract class).
 
-    You do not need to change anything in this class, ever.
-    """
+	You do not need to change anything in this class, ever.
+	"""
 
-    def get_start_state(self):
-        """
-        Returns the start state for the search problem
-        """
-        util.raiseNotDefined()
+	def get_start_state(self):
+		"""
+		Returns the start state for the search problem
+		"""
+		util.raiseNotDefined()
 
-    def is_goal_state(self, state):
-        """
-        state: Search state
+	def is_goal_state(self, state):
+		"""
+		state: Search state
 
-        Returns True if and only if the state is a valid goal state
-        """
-        util.raiseNotDefined()
+		Returns True if and only if the state is a valid goal state
+		"""
+		util.raiseNotDefined()
 
-    def get_successors(self, state):
-        """
-        state: Search state
+	def get_successors(self, state):
+		"""
+		state: Search state
 
-        For a given state, this should return a list of triples,
-        (successor, action, stepCost), where 'successor' is a
-        successor to the current state, 'action' is the action
-        required to get there, and 'stepCost' is the incremental
-        cost of expanding to that successor
-        """
-        util.raiseNotDefined()
+		For a given state, this should return a list of triples,
+		(successor, action, stepCost), where 'successor' is a
+		successor to the current state, 'action' is the action
+		required to get there, and 'stepCost' is the incremental
+		cost of expanding to that successor
+		"""
+		util.raiseNotDefined()
 
-    def get_cost_of_actions(self, actions):
-        """
-        actions: A list of actions to take
+	def get_cost_of_actions(self, actions):
+		"""
+		actions: A list of actions to take
 
-        This method returns the total cost of a particular sequence of actions.  The sequence must
-        be composed of legal moves
-        """
-        util.raiseNotDefined()
-
-
+		This method returns the total cost of a particular sequence of actions.  The sequence must
+		be composed of legal moves
+		"""
+		util.raiseNotDefined()
 
 
 def depth_first_search(problem):
@@ -69,67 +68,64 @@ def depth_first_search(problem):
 	      problem.get_successors(problem.get_start_state()))
 
 	"""
-	"*** YOUR CODE HERE ***"
 	visited = set()
 	current = None
-	current_move = None
-	v = [problem.get_start_state()]
-	e = []
+	current_move = []
+	v = np.array([problem.get_start_state()])
+	e = np.array([])
 	fringe = util.Stack()
-	fringe.push((problem.get_start_state(), None))
+	fringe.push((problem.get_start_state(), []))
 	move_list = []
-
-	vertex_lamda = lambda x: x[0]
-	edge_lamda = lambda x: x[1]
 
 	while not fringe.isEmpty():
 		current, current_move = fringe.pop()
 		if problem.is_goal_state(current):
-			return e
+			return current_move
 		elif current not in visited:
-			print(current.state)
-			v_new = list(map(vertex_lamda, problem.get_successors(current)))
-			e_new = list(map(edge_lamda, problem.get_successors(current)))
-			for vertex_ind in range(len(v_new)):
-				fringe.push((v_new[vertex_ind], e_new[vertex_ind]))
-			v = v + v_new
-			e = e + e_new
+			v_e_new = np.array(problem.get_successors(current))
+			if len(v_e_new) == 0:
+				continue
+			v_new = v_e_new[:, 0]
+			e_new = v_e_new[:, 1]
+			for vertex_edge in v_e_new:
+				fringe.push((vertex_edge[0], current_move + [vertex_edge[1]]))
+			v = np.concatenate((v, v_new), axis=None)
+			e = np.concatenate((e, e_new), axis=None)
 			visited.add(current)
 
+	return []
 
-	return e
 
 def breadth_first_search(problem):
-    """
-    Search the shallowest nodes in the search tree first.
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+	"""
+	Search the shallowest nodes in the search tree first.
+	"""
+	"*** YOUR CODE HERE ***"
+	util.raiseNotDefined()
 
 
 def uniform_cost_search(problem):
-    """
-    Search the node of least total cost first.
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+	"""
+	Search the node of least total cost first.
+	"""
+	"*** YOUR CODE HERE ***"
+	util.raiseNotDefined()
 
 
 def null_heuristic(state, problem=None):
-    """
-    A heuristic function estimates the cost from the current state to the nearest
-    goal in the provided SearchProblem.  This heuristic is trivial.
-    """
-    return 0
+	"""
+	A heuristic function estimates the cost from the current state to the nearest
+	goal in the provided SearchProblem.  This heuristic is trivial.
+	"""
+	return 0
 
 
 def a_star_search(problem, heuristic=null_heuristic):
-    """
-    Search the node that has the lowest combined cost and heuristic first.
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+	"""
+	Search the node that has the lowest combined cost and heuristic first.
+	"""
+	"*** YOUR CODE HERE ***"
+	util.raiseNotDefined()
 
 
 # Abbreviations
