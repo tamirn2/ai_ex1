@@ -68,14 +68,12 @@ def depth_first_search(problem):
 	      problem.get_successors(problem.get_start_state()))
 
 	"""
+	# todo: improve performance in blokus (best is 1163 in blokus, ours 1477)
 	visited = set()
-	current = None
-	current_move = []
 	v = np.array([problem.get_start_state()])
 	e = np.array([])
 	fringe = util.Stack()
 	fringe.push((problem.get_start_state(), []))
-	move_list = []
 
 	while not fringe.isEmpty():
 		current, current_move = fringe.pop()
@@ -100,8 +98,31 @@ def breadth_first_search(problem):
 	"""
 	Search the shallowest nodes in the search tree first.
 	"""
-	"*** YOUR CODE HERE ***"
-	util.raiseNotDefined()
+	# todo: improve performance in blokus_fill (best is 2114 in blokus, ours 2664)
+	# todo: improve performance in blokus_corner (best is 9023 in blokus, ours 9613 )
+	visited = set()
+	v = np.array([problem.get_start_state()])
+	e = np.array([])
+	fringe = util.Queue()
+	fringe.push((problem.get_start_state(), []))
+
+	while not fringe.isEmpty():
+		current, current_move = fringe.pop()
+		if problem.is_goal_state(current):
+			return current_move
+		elif current not in visited:
+			v_e_new = np.array(problem.get_successors(current))
+			if len(v_e_new) == 0:
+				continue
+			v_new = v_e_new[:, 0]
+			e_new = v_e_new[:, 1]
+			for vertex_edge in v_e_new:
+				fringe.push((vertex_edge[0], current_move + [vertex_edge[1]]))
+			v = np.concatenate((v, v_new), axis=None)
+			e = np.concatenate((e, e_new), axis=None)
+			visited.add(current)
+
+	return []
 
 
 def uniform_cost_search(problem):
