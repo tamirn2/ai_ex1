@@ -61,36 +61,43 @@ def depth_first_search(problem):
 	To get started, you might want to try some of these simple commands to
 	understand the search problem that is being passed in:
 
-	"""
-	"*** YOUR CODE HERE ***"
-
-	def dfs_paths(graph, start, goal, path=None):
-		if path is None:
-			path = [start]
-		if start == goal:
-			yield path
-		for next in graph[start] - set(path):
-			yield from dfs_paths(graph, next, goal, path + [next])
-	# list(dfs_paths(graph, 'C', 'F'))  # [['C', 'F'], ['C', 'A', 'B', 'E', 'F']]
-
 	print("Start:", problem.get_start_state().state)
 	print("Is the start a goal?",
 	      problem.is_goal_state(problem.get_start_state()))
 
 	print("Start's successors:",
 	      problem.get_successors(problem.get_start_state()))
-	a = problem.get_successors(problem.get_start_state())[0][0]
-	# b = problem.get_successors(a.state)
-	print(a.state)
-	# print(problem.get_successors())
-	# while not problem.is_goal_state(problem.get_start_state()):
-	# 	for ()
-	# 		break
 
-	return [problem.get_successors(problem.get_start_state())[0][1]]
+	"""
+	"*** YOUR CODE HERE ***"
+	visited = set()
+	current = None
+	current_move = None
+	v = [problem.get_start_state()]
+	e = []
+	fringe = util.Stack()
+	fringe.push((problem.get_start_state(), None))
+	move_list = []
 
-	# util.raiseNotDefined()
+	vertex_lamda = lambda x: x[0]
+	edge_lamda = lambda x: x[1]
 
+	while not fringe.isEmpty():
+		current, current_move = fringe.pop()
+		if problem.is_goal_state(current):
+			return e
+		elif current not in visited:
+			print(current.state)
+			v_new = list(map(vertex_lamda, problem.get_successors(current)))
+			e_new = list(map(edge_lamda, problem.get_successors(current)))
+			for vertex_ind in range(len(v_new)):
+				fringe.push((v_new[vertex_ind], e_new[vertex_ind]))
+			v = v + v_new
+			e = e + e_new
+			visited.add(current)
+
+
+	return e
 
 def breadth_first_search(problem):
     """
