@@ -114,7 +114,17 @@ def blokus_corners_heuristic(state, problem):
     inadmissible or inconsistent heuristics may find optimal solutions, so be careful.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    max_cost = 0
+    for index, piece_state in enumerate(state.pieces[0]):
+        if piece_state:
+            max_cost += state.piece_list.pieces[index].num_tiles
+
+
+
+
+
+    return 0
+
 
 
 class BlokusCoverProblem(SearchProblem):

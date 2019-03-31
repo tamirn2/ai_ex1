@@ -76,9 +76,9 @@ def depth_first_search(problem):
 	fringe.push((problem.get_start_state(), []))
 
 	while not fringe.isEmpty():
-		current, current_move = fringe.pop()
+		current, move_list = fringe.pop()
 		if problem.is_goal_state(current):
-			return current_move
+			return move_list
 		elif current not in visited:
 			v_e_new = np.array(problem.get_successors(current))
 			if len(v_e_new) == 0:
@@ -86,7 +86,7 @@ def depth_first_search(problem):
 			v_new = v_e_new[:, 0]
 			e_new = v_e_new[:, 1]
 			for vertex_edge in v_e_new:
-				fringe.push((vertex_edge[0], current_move + [vertex_edge[1]]))
+				fringe.push((vertex_edge[0], move_list + [vertex_edge[1]]))
 			v = np.concatenate((v, v_new), axis=None)
 			e = np.concatenate((e, e_new), axis=None)
 			visited.add(current)
@@ -107,9 +107,9 @@ def breadth_first_search(problem):
 	fringe.push((problem.get_start_state(), []))
 
 	while not fringe.isEmpty():
-		current, current_move = fringe.pop()
+		current, move_list = fringe.pop()
 		if problem.is_goal_state(current):
-			return current_move
+			return move_list
 		elif current not in visited:
 			v_e_new = np.array(problem.get_successors(current))
 			if len(v_e_new) == 0:
@@ -117,7 +117,7 @@ def breadth_first_search(problem):
 			v_new = v_e_new[:, 0]
 			e_new = v_e_new[:, 1]
 			for vertex_edge in v_e_new:
-				fringe.push((vertex_edge[0], current_move + [vertex_edge[1]]))
+				fringe.push((vertex_edge[0], move_list + [vertex_edge[1]]))
 			v = np.concatenate((v, v_new), axis=None)
 			e = np.concatenate((e, e_new), axis=None)
 			visited.add(current)
@@ -130,7 +130,33 @@ def uniform_cost_search(problem):
 	Search the node of least total cost first.
 	"""
 	"*** YOUR CODE HERE ***"
-	util.raiseNotDefined()
+	visited = set()
+	v = np.array([problem.get_start_state()])
+	e = np.array([])
+	fringe = util.PriorityQueue()
+	fringe.push((problem.get_start_state(), []), 0)
+
+	while not fringe.isEmpty():
+		current, move_list = fringe.pop()
+
+		if problem.is_goal_state(current):
+			return move_list
+		elif current not in visited:
+			v_e_new = np.array(problem.get_successors(current))
+			if len(v_e_new) == 0:
+				continue
+			v_new = v_e_new[:, 0]
+			e_new = v_e_new[:, 1]
+			for vertex_edge in v_e_new:
+				vertex_edge[0].__class__.__lt__ = lambda x, y: (True)
+				vertex_edge[1].__class__.__lt__ = lambda x, y: (True)
+				fringe.push((vertex_edge[0], move_list + [vertex_edge[1]]),
+				            problem.get_cost_of_actions(move_list) + vertex_edge[2])
+			v = np.concatenate((v, v_new), axis=None)
+			e = np.concatenate((e, e_new), axis=None)
+			visited.add(current)
+
+	return []
 
 
 def null_heuristic(state, problem=None):
@@ -146,7 +172,33 @@ def a_star_search(problem, heuristic=null_heuristic):
 	Search the node that has the lowest combined cost and heuristic first.
 	"""
 	"*** YOUR CODE HERE ***"
-	util.raiseNotDefined()
+	visited = set()
+	v = np.array([problem.get_start_state()])
+	e = np.array([])
+	fringe = util.PriorityQueue()
+	fringe.push((problem.get_start_state(), [], 0), 0)
+
+	while not fringe.isEmpty():
+		current, move_list, move_list_cost = fringe.pop()
+		if problem.is_goal_state(current):
+			return move_list
+		elif current not in visited:
+			v_e_new = np.array(problem.get_successors(current))
+			if len(v_e_new) == 0:
+				continue
+			v_new = v_e_new[:, 0]
+			e_new = v_e_new[:, 1]
+			for vertex_edge in v_e_new:
+				vertex_edge[0].__class__.__lt__ = lambda x, y: (True)
+				vertex_edge[1].__class__.__lt__ = lambda x, y: (True)
+				tot_cost =  move_list_cost + vertex_edge[2]
+				fringe.push((vertex_edge[0], move_list + [vertex_edge[1]], tot_cost),
+				            tot_cost + heuristic(vertex_edge[0], problem))
+			v = np.concatenate((v, v_new), axis=None)
+			e = np.concatenate((e, e_new), axis=None)
+			visited.add(current)
+
+	return []
 
 
 # Abbreviations
