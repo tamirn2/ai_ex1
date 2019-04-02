@@ -1,6 +1,9 @@
 from board import Board
 from search import SearchProblem, ucs
 import util, math
+import numpy as np
+
+PLAYER_0 = 0
 
 
 class BlokusFillProblem(SearchProblem):
@@ -103,10 +106,10 @@ class BlokusCornersProblem(SearchProblem):
 		return tot_cost
 
 
-def pitaguras_dist(xy1, xy2):
-	a = (xy2[0] - xy1[0])
-	b = (xy2[1] - xy1[1])
-	c = math.floor(((a ** 2) + (b ** 2)) ** 0.5)
+def chevichev_dist(xy1, xy2):
+	a = abs(xy2[0] - xy1[0])
+	b = abs(xy2[1] - xy1[1])
+	c = max(a, b)
 	return c
 
 
@@ -135,13 +138,18 @@ def blokus_corners_heuristic(state, problem):
 			if state.state[y][x] == 0:
 				for i, corner in enumerate(corners):
 					min_d = min(corners_distance[corner],
-					            pitaguras_dist(
+								chevichev_dist(
 						            (x, y),
 						            (corner[0], corner[1])))
 					corners_distance[corner] = min_d
 
 	for val in corners_distance.values():
-		cost += max(val, 0)
+		cost += val
+
+	free_corner_count = 0
+	for corner in corners:
+		if state.state[corner[0]][corner[1]] == -1:
+			free_corner_count += 1
 
 	return cost
 
@@ -152,6 +160,7 @@ class BlokusCoverProblem(SearchProblem):
 		self.targets = targets.copy()
 		self.expanded = 0
 		self.board = Board(board_w, board_h, 1, piece_list, starting_point)
+		self.action_list = list()
 
 	def get_start_state(self):
 		"""
@@ -160,10 +169,8 @@ class BlokusCoverProblem(SearchProblem):
 		return self.board
 
 	def is_goal_state(self, state):
-		"*** YOUR CODE HERE ***"
-
 		for target in self.targets:
-			if state.state[target[0], target[1]] == -1:
+			if state.state[target[0]][target[1]] == -1:
 				return False
 		return True
 
@@ -206,7 +213,7 @@ def blokus_cover_heuristic(state, problem):
 			if state.state[y][x] == 0:
 				for i, target in enumerate(problem.targets):
 					min_d = min(target_distance[target],
-					            pitaguras_dist(
+								chevichev_dist(
 						            (x, y),
 						            (target[0], target[1])))
 					target_distance[target] = min_d
@@ -227,13 +234,23 @@ class ClosestLocationSearch:
 	             targets=(0, 0)):
 		self.expanded = 0
 		self.targets = targets.copy()
-		"*** YOUR CODE HERE ***"
+		self.board = Board(board_w, board_h, 1, piece_list, starting_point)
+		self.starting_point = starting_point
 
 	def get_start_state(self):
 		"""
 		Returns the start state for the search problem
 		"""
 		return self.board
+
+	def update_closest(self, problem, action_list):
+
+		problem.action_list.extend(action_list)
+		for move in action_list:
+			problem.board.add_move(PLAYER_0, move)
+
+		return problem, action_list
+
 
 	def solve(self):
 		"""
@@ -254,8 +271,26 @@ class ClosestLocationSearch:
 
 		return backtrace
 		"""
-		"*** YOUR CODE HERE ***"
-		util.raiseNotDefined()
+		current_state = self.board.__copy__()
+		backtrace = []
+
+		sort_function = lambda x: chevichev_dist(self.starting_point, x)
+
+		sort_targets = sorted(self.targets, key=sort_function)
+
+
+		closest_problem = BlokusCoverProblem(current_state.board_w, current_state.board_h,
+											 current_state.piece_list, self.starting_point)
+		for target in sort_targets:
+			closest_problem.targets = [target]
+
+			action_list = ucs(closest_problem)
+			closest_problem, action_list = self.update_closest(closest_problem, action_list)
+
+			backtrace += action_list
+			self.expanded += closest_problem.expanded
+
+		return backtrace
 
 
 class MiniContestSearch:

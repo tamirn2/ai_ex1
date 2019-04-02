@@ -130,6 +130,8 @@ def uniform_cost_search(problem):
 	Search the node of least total cost first.
 	"""
 	"*** YOUR CODE HERE ***"
+	start_time = time.time()
+	counter = 0
 	visited = set()
 	v = np.array([problem.get_start_state()])
 	e = np.array([])
@@ -137,6 +139,7 @@ def uniform_cost_search(problem):
 	fringe.push((problem.get_start_state(), []), 0)
 
 	while not fringe.isEmpty():
+		counter += 1
 		current, move_list = fringe.pop()
 
 		if problem.is_goal_state(current):
@@ -156,6 +159,9 @@ def uniform_cost_search(problem):
 			v = np.concatenate((v, v_new), axis=None)
 			e = np.concatenate((e, e_new), axis=None)
 			visited.add(current)
+		if counter % 100 == 0:
+			print(r"Counter is:", counter)
+			print(r"Time running is:", time.time() - start_time)
 
 	return []
 
@@ -172,7 +178,6 @@ def a_star_search(problem, heuristic=null_heuristic):
 	"""
 	Search the node that has the lowest combined cost and heuristic first.
 	"""
-	"*** YOUR CODE HERE ***"
 	start_time = time.time()
 	visited = set()
 	v = np.array([problem.get_start_state()])
@@ -201,6 +206,7 @@ def a_star_search(problem, heuristic=null_heuristic):
 				vertex_edge[1].__class__.__lt__ = lambda x, y: (True)
 				tot_cost = move_list_cost + vertex_edge[2]
 				heuristic_cost = heuristic(vertex_edge[0], problem)
+				# print(tot_cost + heuristic_cost)
 
 				fringe.push(
 					(vertex_edge[0], move_list + [vertex_edge[1]], tot_cost),
