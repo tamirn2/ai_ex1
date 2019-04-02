@@ -2,7 +2,7 @@
 In search.py, you will implement generic search algorithms
 """
 
-import util
+import util, time
 import numpy as np
 
 
@@ -62,10 +62,10 @@ def depth_first_search(problem):
 
 	print("Start:", problem.get_start_state().state)
 	print("Is the start a goal?",
-	      problem.is_goal_state(problem.get_start_state()))
+		  problem.is_goal_state(problem.get_start_state()))
 
 	print("Start's successors:",
-	      problem.get_successors(problem.get_start_state()))
+		  problem.get_successors(problem.get_start_state()))
 
 	"""
 	# todo: improve performance in blokus (best is 1163 in blokus, ours 1477)
@@ -151,7 +151,8 @@ def uniform_cost_search(problem):
 				vertex_edge[0].__class__.__lt__ = lambda x, y: (True)
 				vertex_edge[1].__class__.__lt__ = lambda x, y: (True)
 				fringe.push((vertex_edge[0], move_list + [vertex_edge[1]]),
-				            problem.get_cost_of_actions(move_list) + vertex_edge[2])
+				            problem.get_cost_of_actions(move_list) +
+				            vertex_edge[2])
 			v = np.concatenate((v, v_new), axis=None)
 			e = np.concatenate((e, e_new), axis=None)
 			visited.add(current)
@@ -172,14 +173,21 @@ def a_star_search(problem, heuristic=null_heuristic):
 	Search the node that has the lowest combined cost and heuristic first.
 	"""
 	"*** YOUR CODE HERE ***"
+	start_time = time.time()
 	visited = set()
 	v = np.array([problem.get_start_state()])
 	e = np.array([])
 	fringe = util.PriorityQueue()
 	fringe.push((problem.get_start_state(), [], 0), 0)
-
+	counter = 0
 	while not fringe.isEmpty():
+
+		counter += 1
 		current, move_list, move_list_cost = fringe.pop()
+		# if counter % 100 == 0:
+		# 	print("board")
+		# 	print(current.state)
+
 		if problem.is_goal_state(current):
 			return move_list
 		elif current not in visited:
@@ -191,12 +199,26 @@ def a_star_search(problem, heuristic=null_heuristic):
 			for vertex_edge in v_e_new:
 				vertex_edge[0].__class__.__lt__ = lambda x, y: (True)
 				vertex_edge[1].__class__.__lt__ = lambda x, y: (True)
-				tot_cost =  move_list_cost + vertex_edge[2]
-				fringe.push((vertex_edge[0], move_list + [vertex_edge[1]], tot_cost),
-				            tot_cost + heuristic(vertex_edge[0], problem))
+				tot_cost = move_list_cost + vertex_edge[2]
+				heuristic_cost = heuristic(vertex_edge[0], problem)
+
+				fringe.push(
+					(vertex_edge[0], move_list + [vertex_edge[1]], tot_cost),
+					tot_cost + heuristic_cost)
+
 			v = np.concatenate((v, v_new), axis=None)
 			e = np.concatenate((e, e_new), axis=None)
 			visited.add(current)
+		if counter % 100 == 0:
+			print(r"Counter is:", counter)
+			print(r"Time running is:", time.time() - start_time)
+			# print(r"cost is: ", heuristic_cost)
+			# print("board")
+			# print(vertex_edge[0].state)
+
+
+	# print("the cost is: " + str(heuristic_cost))
+
 
 	return []
 
